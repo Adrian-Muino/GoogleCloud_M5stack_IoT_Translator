@@ -21,7 +21,7 @@ repeat_button = M5Btn(text='Repeat', x=88, y=132, w=200, h=50, bg_c=0xd2ab6f, te
 transcription_output = M5Label('transcribed_text', x=5, y=20, color=0x000, font=FONT_MONT_10, parent=None)
 translate_button = M5Btn(text='Translate', x=88, y=190, w=210, h=50, bg_c=0x3f804e, text_c=0xffffff, font=FONT_MONT_22, parent=None)
 
-######### Gloabl variables #########
+######### Global variables #########
 
 translation_text = None
 
