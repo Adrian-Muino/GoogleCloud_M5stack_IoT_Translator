@@ -6,6 +6,7 @@ from uiflow import *
 from m5stack import mic
 import urequests
 import base64
+import re
 
 ######### Default settings (screen & lateral light) #########
 
@@ -98,7 +99,7 @@ def transcribe_wav():
         if response.status_code == 200:
             transcription = response.json()['results'][0]['alternatives'][0]['transcript']
             global transcribed_text
-            transcribed_text = transcription
+            transcribed_text = html_unescape(transcription)
         else:
             global transcribed_text
             transcribed_text = "Error in transcribed method"
@@ -131,7 +132,7 @@ def translate_text():
       if response.status_code == 200:
           translation = response.json()['data']['translations'][0]['translatedText']
           global translated_text
-          translated_text = translation
+          translated_text = html_unescape(translation)
       else:
           global translated_text
           translated_text = "Error in translate: " + str(response.status_code)
@@ -186,3 +187,16 @@ def assign_result_to_transcribed_text():
 def assign_result_to_translated_text():
     global translated_text
     translated_output.set_text(str(translated_text))
+
+######### Html_unsecape method to avoid encoding errors because the responses are encoded in html and we need them in plain text #########
+
+def html_unescape(s):
+    s = s.replace("&amp;", "&")
+    s = s.replace("&lt;", "<")
+    s = s.replace("&gt;", ">")
+    s = s.replace("&quot;", "\"")
+    s = s.replace("&#39;", "'")
+    s = re.sub("&#(\d+);", lambda m: chr(int(m.group(1))), s)
+    return s
+
+
