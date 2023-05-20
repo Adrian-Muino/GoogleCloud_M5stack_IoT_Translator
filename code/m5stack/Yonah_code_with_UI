@@ -1,0 +1,321 @@
+# Imports
+
+from m5stack import *
+from m5stack_ui import *
+from uiflow import *
+from m5stack import mic
+import urequests
+import base64
+import re
+import wifiCfg
+import time
+import machine
+
+################################################ WIFI settings ################################################
+
+# Configure and connect to Wi-Fi network
+
+#wifiCfg.doConnect('SSID', 'PSW')  # UPDATE SSID & PSW with your Wi-Fi credentials
+#while not (wifiCfg.wlan_sta.isconnected()):
+#  wait(1)
+#  print('Waiting connect')
+#print('Connected')
+
+################################################ INIT & Global variables ################################################ 
+
+######### Init #########
+
+screen = M5Screen()
+screen.clean_screen()
+# Set background color
+screen.set_screen_bg_color(0x0b0c14) 
+# Set lateral light color
+rgb.setColorAll(0x33ff33) 
+
+# Buttons 
+start_button = M5Btn(text='START', x=90, y=199, w=140, h=30, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+language_button = M5Btn(text='CHOOSE LANGUAGE', x=25, y=61, w=270, h=44, bg_c=0x1d54bd, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+record_button = M5Btn(text='RECORD', x=25, y=126, w=96, h=98, bg_c=0x9b0000, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+repeat_button = M5Btn(text='REPEAT', x=146, y=126, w=149, h=39, bg_c=0x626262, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+translate_button = M5Btn(text='TRANSLATE', x=146, y=185, w=149, h=39, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+
+# Labels
+logo_text = M5Label('uTranslate', x=71, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+# For debug
+# ! BREAKS RECORD BUTTON IF I DELETE THEM
+#transcribed_output = M5Label('transcribed_text', x=5, y=20, color=0x000, font=FONT_MONT_10, parent=None)
+#translated_output = M5Label('translated_text', x=5, y=40, color=0x000, font=FONT_MONT_10, parent=None)
+#say_translated_text_output = M5Label('say_translated_text_output', x=5, y=60, color=0x000, font=FONT_MONT_10, parent=None)
+
+# Images
+menu_image = M5Img("res/Menu_285x195px.png", x=17, y=0, parent=None)
+logo_image = M5Img("res/Logo_34x34pxpng.png", x=25, y=16, parent=None)
+#mycrophone_icon = M5Img("res/mycrophone_icon_100x100.png", x=110, y=124, parent=None)
+#recording_icon = M5Img("res/recording_icon_100x100.png", x=109, y=17, parent=None)
+#mycrophone_icon.set_hidden(True)
+#recording_icon.set_hidden(True)
+
+# Main Screen Global variables
+transcribed_text = None
+translated_text = None
+
+language_input_ui = 'en'
+language_output_ui = 'fr'
+
+################################################ Interfaces ################################################
+
+######### Menu Screen Interface #########
+
+def start_button_pressed():
+    hide_menu_screen()
+    show_main_screen()
+    
+def show_menu_screen():
+    # Set up the main screen components
+    global screen, start_button, menu_image
+    rgb.setColorAll(0x33ff33)
+    start_button.set_hidden(False)
+    start_button.pressed(start_button_pressed)
+    
+def hide_menu_screen():
+  # Set up the main screen components
+    global screen, start_button, menu_image
+    start_button.set_hidden(True)
+    menu_image.set_hidden(True)
+
+
+######### Main Screen Interface #########
+def show_main_screen():
+    # Set up the main screen components
+    global screen, language_button, record_button, repeat_button, translate_button, logo_image, logo_text #, transcribed_output, translated_output, say_translated_text_output
+    rgb.setColorAll(0x33ff33)
+
+    # Show interface components
+    logo_text.set_hidden(False)
+    logo_image.set_hidden(False)
+    language_button.set_hidden(False)
+    record_button.set_hidden(False)
+    repeat_button.set_hidden(False)
+    translate_button.set_hidden(False)
+    #transcribed_output.set_hidden(False)
+    #translated_output.set_hidden(False)
+    #say_translated_text_output.set_hidden(False)
+
+def hide_main_screen():
+    # Hide the main screen components
+    global screen, language_button, record_button, repeat_button, translate_button, logo_image, logo_text #, transcribed_output, translated_output, say_translated_text_output
+
+    # Hide the Buttons & labels of the main screen
+    logo_text.set_hidden(True)
+    logo_image.set_hidden(True)
+    language_button.set_hidden(True)
+    record_button.set_hidden(True)
+    repeat_button.set_hidden(True)
+    translate_button.set_hidden(True)
+    #transcribed_output.set_hidden(True)
+    #translated_output.set_hidden(True)
+    #say_translated_text_output.set_hidden(True)
+
+
+################################################ METHODS ################################################
+
+######### Start button pressed method #########
+
+def start_application():
+    hide_main_screen()
+    show_menu_screen()
+
+start_application()
+
+######### Record button pressed method #########
+
+def record_button_pressed():
+    rgb.setColorAll(0x0064b0)
+    show_img_record()
+    machine.Timer(-1).init(period=1000, mode=machine.Timer.ONE_SHOT, callback=record)
+
+record_button.pressed(record_button_pressed)
+
+def show_img_record():
+  # Show the recording icons
+    mycrophone_icon.set_hidden(False)
+    recording_icon.set_hidden(False)
+
+
+def hide_img_record():
+  # Hide the recording icons
+    mycrophone_icon.set_hidden(True)
+    recording_icon.set_hidden(True)
+
+def record(timer):
+    try:
+      # Record audio to a file
+        mic.record2file(5, '/flash/sound1.wav')
+    except Exception as e:
+        print(e)
+    finally:
+        hide_img_record()
+        show_main_screen()
+
+
+######### Repeat button pressed method #########
+
+def repeat_button_pressed():
+  rgb.setColorAll(0x0064b0)
+  speaker.playWAV('/flash/sound2.wav', volume=6)
+  rgb.setColorAll(0x33ff33)
+
+repeat_button.pressed(repeat_button_pressed)
+
+######### Translate button pressed method #########
+
+def translate_button_pressed():
+  rgb.setColorAll(0x0064b0)
+  transcribe_wav()
+  assign_result_to_transcribed_text()
+  rgb.setColorAll(0x010d41)
+  translate_text()
+  assign_result_to_translated_text()
+  rgb.setColorAll(0x0064b0)
+  say_translated_text()
+  rgb.setColorAll(0x33ff33)
+  
+translate_button.pressed(translate_button_pressed) 
+
+######### Transcribe method using Cloud #########
+
+def transcribe_wav():
+  
+    # Set the API key and language code
+    api_key = 'AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0'
+    language_code = 'en-US'
+
+    # Set the URL of the Speech-to-Text API endpoint  
+    url = 'https://speech.googleapis.com/v1/speech:recognize?key=' + api_key
+
+    # Read the content of the WAV file
+    with open('/flash/sound1.wav', 'rb') as f:
+        content = f.read()
+
+    # Encode the content as base64
+    audio_content = base64.b64encode(content).decode('utf-8')
+
+    # Set the request headers
+    headers = {'Content-Type': 'application/json'}
+
+    # Set the request data
+    data = {
+    'config': {
+        'language_code': language_code
+    },
+    'audio': {
+        'content': audio_content
+    }
+    }
+
+    try:
+        response = urequests.post(url, headers=headers, json=data)
+        if response.status_code == 200:
+          # Extract the transcribed text from the response
+            transcription = response.json()['results'][0]['alternatives'][0]['transcript']
+            global transcribed_text
+            transcribed_text = html_unescape(transcription)
+        else:
+            global transcribed_text
+            transcribed_text = "Error in transcribed method"
+    except Exception as e:
+        transcription_output.set_text(str(e))
+
+######### Translate method using Cloud #########
+
+def translate_text():
+  api_key = 'AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0'
+  # Set the URL of the Cloud Function endpoint
+  url = 'https://translation.googleapis.com/language/translate/v2?key=' + api_key
+
+  # Set the input and output languages
+  global language_input_ui
+  language_input = language_input_ui
+  global language_output_ui
+  language_output = language_output_ui
+
+  # Set the request data
+  global transcribed_text
+  data = {'q': [transcribed_text], 'source': language_input, 'target': language_output}
+
+  # Set the request headers
+  headers = {'Content-Type': 'application/json'}
+
+  try:
+    response = urequests.post(url, headers=headers, json=data)
+    if response.status_code == 200:
+       # Extract the translated text from the response
+      translation = response.json()['data']['translations'][0]['translatedText']
+      global translated_text
+      translated_text = html_unescape(translation)
+    else:
+      global translated_text
+      translated_text = "Error in translate: " + str(response.status_code)
+  except Exception as e:
+    global translated_text
+    translated_text = "Error in translate: " + str(e)
+
+######### Say translated text method using cloud  #########
+
+def say_translated_text():
+    api_key = 'AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0'
+    
+    # Set the URL of the Cloud Text-to-Speech API endpoint
+    url = 'https://texttospeech.googleapis.com/v1/text:synthesize?key=' + api_key
+
+    # Set the request data
+    global translated_text
+    global language_output_ui
+
+    data ={
+        'input': {'text': translated_text},
+        'voice': {'languageCode': language_output_ui, 'ssmlGender': 'FEMALE'},
+        'audioConfig': {'audioEncoding': 'LINEAR16', 'sampleRateHertz': 16000}
+    }
+
+    # Set the request headers
+    headers = {'Content-Type': 'application/json'}
+
+    try:
+        response = urequests.post(url, headers=headers, json=data)
+        if response.status_code == 200:
+            # Decode the audio content from base64 and save it to a file
+            audio_content = base64.b64decode(response.json()['audioContent'])
+            with open('/flash/sound2.wav', 'wb') as f:
+                f.write(audio_content)
+            # Play the audio file
+            repeat_button_pressed()
+        else:
+            global say_translated_text_output
+            say_translated_text_output = "Error in translate: " + str(response.status_code)
+    except Exception as e:
+        global translated_text_output
+        translated_text_output = "Error in translate: " + str(e)
+
+######### Assign result to transcribed label method #########
+
+def assign_result_to_transcribed_text():
+    global transcribed_text
+    transcribed_output.set_text(str(transcribed_text))
+
+######### Assign result to translation label method #########
+
+def assign_result_to_translated_text():
+    global translated_text
+    translated_output.set_text(str(translated_text))
+
+######### Html_unsecape method to avoid encoding errors because the responses are encoded in html and we need them in plain text #########
+
+def html_unescape(s):
+    s = s.replace("&amp;", "&")
+    s = s.replace("&lt;", "<")
+    s = s.replace("&gt;", ">")
+    s = s.replace("&quot;", "\"")
+    s = s.replace("&#39;", "'")
+    s = re.sub("&#(\d+);", lambda m: chr(int(m.group(1))), s)
+    return s
