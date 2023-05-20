@@ -32,30 +32,28 @@ screen.set_screen_bg_color(0x0b0c14)
 # Set lateral light color
 rgb.setColorAll(0x33ff33) 
 
-# Buttons 
+# Menu screen components
 start_button = M5Btn(text='START', x=90, y=199, w=140, h=30, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+menu_image = M5Img("res/Menu_285x195px.png", x=17, y=0, parent=None)
+
+# Defining global variables
+repeat_button = M5Btn(text='REPEAT', x=146, y=126, w=149, h=39, bg_c=0x626262, text_c=0xffffff, font=FONT_MONT_18, parent=None)
 language_button = M5Btn(text='CHOOSE LANGUAGE', x=25, y=61, w=270, h=44, bg_c=0x1d54bd, text_c=0xffffff, font=FONT_MONT_18, parent=None)
 record_button = M5Btn(text='RECORD', x=25, y=126, w=96, h=98, bg_c=0x9b0000, text_c=0xffffff, font=FONT_MONT_18, parent=None)
-repeat_button = M5Btn(text='REPEAT', x=146, y=126, w=149, h=39, bg_c=0x626262, text_c=0xffffff, font=FONT_MONT_18, parent=None)
 translate_button = M5Btn(text='TRANSLATE', x=146, y=185, w=149, h=39, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
 
-# Labels
-logo_text = M5Label('uTranslate', x=71, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+# Set global variable hidden by default (before being called in their interface definition)
+buttons = [record_button, repeat_button, language_button, translate_button]
+
+for button in buttons:
+    button.set_hidden(True)
+
 # For debug
-# ! BREAKS RECORD BUTTON IF I DELETE THEM
 #transcribed_output = M5Label('transcribed_text', x=5, y=20, color=0x000, font=FONT_MONT_10, parent=None)
 #translated_output = M5Label('translated_text', x=5, y=40, color=0x000, font=FONT_MONT_10, parent=None)
 #say_translated_text_output = M5Label('say_translated_text_output', x=5, y=60, color=0x000, font=FONT_MONT_10, parent=None)
 
-# Images
-menu_image = M5Img("res/Menu_285x195px.png", x=17, y=0, parent=None)
-logo_image = M5Img("res/Logo_34x34pxpng.png", x=25, y=16, parent=None)
-#mycrophone_icon = M5Img("res/mycrophone_icon_100x100.png", x=110, y=124, parent=None)
-#recording_icon = M5Img("res/recording_icon_100x100.png", x=109, y=17, parent=None)
-#mycrophone_icon.set_hidden(True)
-#recording_icon.set_hidden(True)
-
-# Main Screen Global variables
+# Main screen global variables
 transcribed_text = None
 translated_text = None
 
@@ -64,8 +62,9 @@ language_output_ui = 'fr'
 
 ################################################ Interfaces ################################################
 
-######### Menu Screen Interface #########
+######### Menu Screen Interface ######### 
 
+# Start button pressed method
 def start_button_pressed():
     hide_menu_screen()
     show_main_screen()
@@ -74,7 +73,11 @@ def show_menu_screen():
     # Set up the main screen components
     global screen, start_button, menu_image
     rgb.setColorAll(0x33ff33)
+
+    # Show interface components
     start_button.set_hidden(False)
+    menu_image.set_hidden(False)
+
     start_button.pressed(start_button_pressed)
     
 def hide_menu_screen():
@@ -84,11 +87,20 @@ def hide_menu_screen():
     menu_image.set_hidden(True)
 
 
-######### Main Screen Interface #########
+######### Main Screen Interface ######### 
+
 def show_main_screen():
     # Set up the main screen components
-    global screen, language_button, record_button, repeat_button, translate_button, logo_image, logo_text #, transcribed_output, translated_output, say_translated_text_output
+    global screen, language_button, record_button, repeat_button, translate_button, logo_image, logo_text
     rgb.setColorAll(0x33ff33)
+
+    # Init interface compenents
+    logo_image = M5Img("res/Logo_34x34pxpng.png", x=25, y=16, parent=None)
+    logo_text = M5Label('uTranslate', x=71, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+    language_button = M5Btn(text='CHOOSE LANGUAGE', x=25, y=61, w=270, h=44, bg_c=0x1d54bd, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+    record_button = M5Btn(text='RECORD', x=25, y=126, w=96, h=98, bg_c=0x9b0000, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+    repeat_button = M5Btn(text='REPEAT', x=146, y=126, w=149, h=39, bg_c=0x626262, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+    translate_button = M5Btn(text='TRANSLATE', x=146, y=185, w=149, h=39, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
 
     # Show interface components
     logo_text.set_hidden(False)
@@ -97,55 +109,59 @@ def show_main_screen():
     record_button.set_hidden(False)
     repeat_button.set_hidden(False)
     translate_button.set_hidden(False)
-    #transcribed_output.set_hidden(False)
-    #translated_output.set_hidden(False)
-    #say_translated_text_output.set_hidden(False)
 
 def hide_main_screen():
-    # Hide the main screen components
-    global screen, language_button, record_button, repeat_button, translate_button, logo_image, logo_text #, transcribed_output, translated_output, say_translated_text_output
+    # Hide interface components
+    global screen, language_button, record_button, repeat_button, translate_button, logo_image, logo_text
 
-    # Hide the Buttons & labels of the main screen
     logo_text.set_hidden(True)
     logo_image.set_hidden(True)
     language_button.set_hidden(True)
     record_button.set_hidden(True)
     repeat_button.set_hidden(True)
     translate_button.set_hidden(True)
-    #transcribed_output.set_hidden(True)
-    #translated_output.set_hidden(True)
-    #say_translated_text_output.set_hidden(True)
 
+######### Record Screen Interface #########
+
+def show_record_screen():
+    # Set up the record screen components
+    global screen, logo_image, recording_text, recording_image
+
+    # Init interface compenents
+    logo_image = M5Img("res/Logo_34x34pxpng.png", x=25, y=16, parent=None)
+    recording_text = M5Label('Recording ...', x=76, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+    recording_image = M5Img("res/Recording_151x151px.png", x=86, y=56, parent=None)
+
+    # Show interface components
+    logo_image.set_hidden(False)
+    recording_text.set_hidden(False)
+    recording_image.set_hidden(False)
+
+def hide_record_screen():
+    # Hide interface components
+    global screen, logo_image, recording_text, recording_image
+    logo_image.set_hidden(True)
+    recording_text.set_hidden(True)
+    recording_image.set_hidden(True)
 
 ################################################ METHODS ################################################
 
-######### Start button pressed method #########
+######### Open menu at the start method ######### 
 
 def start_application():
-    hide_main_screen()
     show_menu_screen()
 
 start_application()
 
-######### Record button pressed method #########
+######### Record button pressed method ######### 
 
 def record_button_pressed():
     rgb.setColorAll(0x0064b0)
-    show_img_record()
+    show_record_screen()
+    # Sets the timer for the record method
     machine.Timer(-1).init(period=1000, mode=machine.Timer.ONE_SHOT, callback=record)
 
 record_button.pressed(record_button_pressed)
-
-def show_img_record():
-  # Show the recording icons
-    mycrophone_icon.set_hidden(False)
-    recording_icon.set_hidden(False)
-
-
-def hide_img_record():
-  # Hide the recording icons
-    mycrophone_icon.set_hidden(True)
-    recording_icon.set_hidden(True)
 
 def record(timer):
     try:
@@ -154,11 +170,10 @@ def record(timer):
     except Exception as e:
         print(e)
     finally:
-        hide_img_record()
+        hide_record_screen()
         show_main_screen()
 
-
-######### Repeat button pressed method #########
+######### Repeat button pressed method ######### 
 
 def repeat_button_pressed():
   rgb.setColorAll(0x0064b0)
