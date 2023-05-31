@@ -1,0 +1,43 @@
+######### Menu Screen ######### 
+
+# Screen settings, same for all interfaces
+screen = M5Screen()
+screen.clean_screen()
+screen.set_screen_bg_color(0x0b0c14)
+
+menu_image = M5Img("res/Menu_285x195px.png", x=17, y=0, parent=None)
+touch_button_start = M5Btn(text='START', x=90, y=199, w=140, h=30, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+
+######### Main Screen #########
+
+logo_image = M5Img("res/Logo_34x34pxpng.png", x=25, y=16, parent=None)
+logo_text = M5Label('uTranslate', x=71, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+language_button = M5Btn(text='CHOOSE LANGUAGE', x=25, y=61, w=270, h=44, bg_c=0x1d54bd, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+repeat_button = M5Btn(text='REPEAT', x=146, y=126, w=149, h=39, bg_c=0x626262, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+translate_button = M5Btn(text='TRANSLATE', x=146, y=185, w=149, h=39, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+record_button = M5Btn(text='RECORD', x=25, y=126, w=96, h=98, bg_c=0x9b0000, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+
+######### Recording Screen #########
+
+logo_image = M5Img("res/Logo_34x34pxpng.png", x=25, y=16, parent=None)
+recording_text = M5Label('Recording ...', x=76, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+recording_image = M5Img("res/Recording_151x151px.png", x=86, y=56, parent=None)
+
+######### Translating Screen #########
+
+logo_image = M5Img("res/Logo_34x34pxpng.png", x=25, y=16, parent=None)
+translating_text = M5Label('Translating ...', x=76, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+translating_image = M5Img("res/Translating_151x151px.png", x=86, y=56, parent=None)
+
+######### Settings Screen ######### 
+
+choose_language_text = M5Label('Choose the languages', x=76, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+
+# The input and output language, dropdown menu
+#input_button = M5Btn(text='_', x=30, y=69, w=260, h=38, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+#output_button = M5Btn(text='_', x=30, y=119, w=260, h=38, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+
+save_button = M5Btn(text='SAVE', x=111, y=196, w=97, h=29, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
+logo_image = M5Img("res/Logo_34x34pxpng.png", x=30, y=16, parent=None)
+
+
