@@ -1,40 +1,112 @@
 import requests
-import base64
+import traceback
+
+def get_BCP47_language_tag(language_name):
+    url = 'https://europe-central2-iottranslator.cloudfunctions.net/'
+    method_name = 'get_BCP47_language_tag'
+    endpoint = url + method_name
+    params = {'language_input': language_name}
+
+    try:
+        response = requests.get(endpoint, params=params)
+        response.raise_for_status()  # Raises an exception if the request was unsuccessful
+        return response.text
+    except requests.exceptions.RequestException as e:
+        return f"Error: {str(e)}"
+
+
+def transcribe_wav(input_language_code, encoded_audio_file):
+    url = 'https://europe-central2-iottranslator.cloudfunctions.net/transcribe_wav'
+
+    # Create the request payload
+    payload = {
+        'input_language_code': input_language_code,
+        'encoded_audio_file': encoded_audio_file
+    }
+
+    try:
+        response = requests.post(url, json=payload)
+        if response.status_code == 200:
+            transcription = response.text
+            return transcription
+        else:
+            return 'Error in transcription: ' + response.text, response.status_code
+    except requests.exceptions.RequestException as e:
+        return f"Error: {str(e)}"
+
+
+def translate_text(transcribed_text,input_language_code,language_output_code):
+
+    url = "https://europe-central2-iottranslator.cloudfunctions.net/translate_text"
+
+    payload = {
+        "transcribed_text": transcribed_text,
+        "input_language_code": input_language_code,
+        "output_language_code": language_output_code
+    }
+
+    response = requests.post(url, json=payload)
+    if response.status_code == 200:
+        data = response.json()
+        translated_text = data.get("translated_text")
+        if translated_text:
+            return translated_text
+        else:
+            error = data.get("error")
+            return f"Translation error: {error}"
+    else:
+        return "Error occurred while making the request.", response.status_code
+
+def generate_audio_from_text(translated_text, output_language_code):
+
+    url = 'https://europe-central2-iottranslator.cloudfunctions.net/generate_audio_from_text'
+    data = {
+        'translated_text': translated_text,
+        'output_language_code': output_language_code
+    }
+
+    try:
+        response = requests.post(url, json=data)
+        if response.status_code == 200:
+            audio_content = response.content
+            # Process the audio content as needed
+            return audio_content
+        else:
+            return "Error: " + str(response.status_code) + "\n" + response.content.decode("utf-8"), response.status_code
+    except Exception as e:
+        return "Error: " + str(e), 500
+
+import traceback
 
 def trigger_iotTranslator_cloud_functions(request):
-    request_json = request.get_json()
-    language_input_name = request_json['language_input_name']
-    language_output_name = request_json['language_output_name']
-    encoded_audio = request_json['encoded_audio']
+    try:
+        if request.method != 'POST':
+            return 'Method not allowed', 405
 
-    main_path = "https://europe-central2-iottranslator.cloudfunctions.net"
+        data = request.get_json()
+        language_input_name = data.get('language_input_name')
+        language_output_name = data.get('language_output_name')
+        encoded_audio_file = data.get('encoded_audio_file')
 
-    # Call get_BCP47_language_tag with language_input_name
-    response = requests.get(f"{main_path}/get_BCP47_language_tag?language={language_input_name}")
-    language_input_BCP47_tag = response.text
+        if not language_input_name or not language_output_name or not encoded_audio_file:
+            return 'Invalid request payload', 400
 
-    # Call get_BCP47_language_tag with language_output_name
-    response = requests.get(f"{main_path}/get_BCP47_language_tag?language={language_output_name}")
-    language_output_BCP47_tag = response.text
+        input_language_code = get_BCP47_language_tag(language_input_name)
+        print("input_language_code : " + input_language_code)
 
-    # Call get_ISO639_language_tag with language_input_name
-    response = requests.get(f"{main_path}/get_ISO639_language_tag?language={language_input_name}")
-    language_input_ISO639_tag = response.text
+        language_output_code = get_BCP47_language_tag(language_output_name)
+        print("language_output_code :" + language_output_code)
 
-    # Call get_ISO639_language_tag with language_output_name
-    response = requests.get(f"{main_path}/get_ISO639_language_tag?language={language_output_name}")
-    language_output_ISO639_tag = response.text
+        transcribed_text = transcribe_wav(input_language_code, encoded_audio_file)
+        print("transcribed_text : " + transcribed_text)
 
-    # Call transcribe_wav with encoded_audio and language_input_BCP47_tag
-    response = requests.post(f"{main_path}/transcribe_wav", json={'audio': encoded_audio, 'language': language_input_BCP47_tag})
-    transcribed_output = response.text
+        translated_text = translate_text(transcribed_text, input_language_code, language_output_code)
+        print("translated_text : " + translated_text)
 
-    # Call translate_text with language_input_ISO639_tag and language_output_ISO639_tag
-    response = requests.post(f"{main_path}/translate_text", json={'input_lang': language_input_ISO639_tag, 'output_lang': language_output_ISO639_tag})
-    translated_output = response.text
+        encoded_output_audio_file = generate_audio_from_text(translated_text, language_output_code)
 
-    # Call say_translated_text with translated_output and language_output_BCP47_tag
-    response = requests.post(f"{main_path}/say_translated_text", json={'text': translated_output, 'language': language_output_BCP47_tag})
-    encoded_output_audio = response.text
+        return encoded_output_audio_file
 
-    return encoded_output_audio
+    except Exception as e:
+        traceback.print_exc()
+        return "Internal server error", 500

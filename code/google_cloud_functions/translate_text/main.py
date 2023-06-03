@@ -1,23 +1,27 @@
 import requests
-import json
+import html
 
 def translate_text(request):
     request_json = request.get_json()
-    language_input = request_json['language_input']
-    language_output = request_json['language_output']
-    transcribed_text = request_json['transcribed_text']
-    api_key = 'AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0'
-    url = 'https://translation.googleapis.com/language/translate/v2?key=' + api_key
+    if request_json and 'transcribed_text' in request_json and 'input_language_code' in request_json and 'output_language_code' in request_json:
+        transcribed_text = request_json['transcribed_text']
+        input_language_code = request_json['input_language_code']
+        output_language_code = request_json['output_language_code']
 
-    data = {'q': [transcribed_text], 'source': language_input, 'target': language_output}
-    headers = {'Content-Type': 'application/json'}
+        api_key = "AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0"
+        url = "https://translation.googleapis.com/language/translate/v2?key="
 
-    try:
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code == 200:
-            translation = response.json()['data']['translations'][0]['translatedText']
-            return json.dumps({'translated_text': translation})
-        else:
-            return json.dumps({'error': 'Error in translate: ' + str(response.status_code)})
-    except Exception as e:
-        return json.dumps({'error': 'Error in translate: ' + str(e)})
+        request_url = f"{url}{api_key}"
+        data = {
+            "q": transcribed_text,
+            "source": input_language_code,
+            "target": output_language_code
+        }
+
+        response = requests.post(request_url, data=data)
+        translated_text = response.json()["data"]["translations"][0]["translatedText"]
+        unescaped_text = html.unescape(translated_text)
+
+        return {"translated_text": unescaped_text}
+    else:
+        return {"error": "Invalid request. Please provide 'transcribed_text', 'input_language_code', and 'output_language_code' in the request body."}

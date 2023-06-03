@@ -1,18 +1,25 @@
-import base64
 import requests
+import json
 
-def transcribe_wav(encoded_audio, language_code):
+
+def transcribe_wav(request):
+    request_json = request.get_json()
+    input_language_code = request_json['input_language_code']
+    encoded_audio_file = request_json['encoded_audio_file']
+
     api_key = 'AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0'
     url = 'https://speech.googleapis.com/v1/speech:recognize?key=' + api_key
 
-    headers = {'Content-Type': 'application/json'}
+    headers = {
+        'Content-Type': 'application/json'
+    }
 
     data = {
         'config': {
-            'language_code': language_code
+            'languageCode': input_language_code
         },
         'audio': {
-            'content': encoded_audio
+            'content': encoded_audio_file
         }
     }
 
