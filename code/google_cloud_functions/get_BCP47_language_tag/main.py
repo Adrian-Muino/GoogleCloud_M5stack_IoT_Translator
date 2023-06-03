@@ -8,3 +8,4 @@ def get_BCP47_language_tag(request):
         return bcp47_language_tag
     except Exception as e:
         return f"Error: {str(e)}"
+
