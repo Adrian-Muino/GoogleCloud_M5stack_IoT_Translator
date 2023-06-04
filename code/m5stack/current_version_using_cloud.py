@@ -405,7 +405,7 @@ def encode_wav():
 def GCF_trigger_iotTranslator_cloud_functions(language_input_name, language_output_name, encoded_audio_file):
     global encoded_audio_translated
     
-    url = "https://europe-central2-iottranslator.cloudfunctions.net/trigger_iotTranslator_cloud_functions"
+    url = "OUR_GCP_FUNCTION_ENDPOINT/trigger_iotTranslator_cloud_functions"
 
     data = {
         'language_input_name': language_input_name,
