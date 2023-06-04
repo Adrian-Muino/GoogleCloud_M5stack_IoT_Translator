@@ -75,9 +75,54 @@ recording_text = M5Label('Recording ...', x=76, y=26, color=0xffffff, font=FONT_
 
 # Settings screen components
 choose_language_text = M5Label('Choose the languages', x=76, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+from_text = M5Label('FROM', x=25, y=75, color=0xffffff, font=FONT_MONT_18, parent=None)
+to_text = M5Label('TO', x=40, y=145, color=0xffffff, font=FONT_MONT_18, parent=None)
 
 # Translating Screen components
 translating_text = M5Label('Translating ...', x=76, y=26, color=0xffffff, font=FONT_MONT_14, parent=None)
+
+# Main screen components
+#language_from_text = M5Label('FROM', x=165, y=15, color=0xffffff, font=FONT_MONT_10, parent=None)
+#language_to_text = M5Label('TO', x=170, y=30, color=0xffffff, font=FONT_MONT_10, parent=None)
+
+######### Init Dropdown Menu #########
+
+# Language Selection
+language_names = {
+    'Arabic' : 'Arabic',
+    'Chinese' : 'Chinese',
+    'Croatian' : 'Croatian',
+    'Danish' : 'Danish',
+    'English' : 'English',
+    'Estonian' : 'Estonian',
+    'French' : 'French',
+    'Galician' : 'Galician',
+    'German' : 'German',
+    'Greek' : 'Greek',
+    'Hindi' : 'Hindi',
+    'Italian' : 'Italian',
+    'Japanese' : 'Japanese',
+    'Korean' : 'Korean',
+    'Polish' : 'Polish',
+    'Portuguese' : 'Portuguese',
+    'Russian' : 'Russian',
+    'Spanish' : 'Spanish',
+    'Swedish' : 'Swedish',
+    'Turkish' : 'Turkish',
+    'Ukrainian' : 'Ukrainian',
+    'Vietnamese' : 'Vietnamese',
+    }
+
+options = list(language_names.keys())
+options.sort()
+
+input_language_dropdown = M5Dropdown(110, 65, 180, 40)
+input_language_dropdown.set_options(options)
+input_language_dropdown.set_sel_index(4)
+
+output_language_dropdown = M5Dropdown(110, 135, 180, 40)
+output_language_dropdown.set_options(options)
+output_language_dropdown.set_sel_index(6)
 
 
 ################################################ Global  ################################################ 
@@ -92,7 +137,6 @@ encoded_audio_file = ''
 
 # for method decode_wav & GCF_trigger_iotTranslator_cloud_functions
 encoded_audio_translated = ''
-
 
 
 ################################################ Interfaces ################################################
@@ -117,6 +161,7 @@ def hide_menu_screen():
 ######### Main Screen Interface ######### 
 
 def show_main_screen():
+    global language_input_name, language_output_name
 
     # Default screen default
     rgb.setColorAll(0x33ff33)
@@ -129,6 +174,18 @@ def show_main_screen():
     repeat_button.set_hidden(False)
     translate_button.set_hidden(False)
 
+#    new_language_from_text = "FROM   "
+#    text_language_from_to_add = language_input_name
+#    language_from_text.setText(str(str(new_language_from_text) + str(text_language_from_to_add)))
+
+#    new_language_to_text = "TO     "
+#    text_language_to_to_add = language_output_name
+#    language_to_text.setText(str(str(new_language_to_text) + str(text_language_to_to_add)))
+    
+#    language_from_text.set_hidden(False)
+#    language_to_text.set_hidden(False)
+
+
 def hide_main_screen():
 
     # Hide interface components
@@ -138,6 +195,8 @@ def hide_main_screen():
     record_button.set_hidden(True)
     repeat_button.set_hidden(True)
     translate_button.set_hidden(True)
+#    language_from_text.set_hidden(True)
+#    language_to_text.set_hidden(True)
 
 ######### Record Screen Interface #########
 
@@ -172,19 +231,23 @@ def hide_translating_screen():
     translating_logo_image.set_hidden(True)
 
 ######### Settings Screen Interface #########
-
 def show_settings_screen():
 
-    #TODO
-    # The input and output language dropdown menu : TO IMPLEMENT
-    #input_button = M5Btn(text='_', x=30, y=69, w=260, h=38, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None)
-    #output_button = M5Btn(text='_', x=30, y=119, w=260, h=38, bg_c=0x03a9f4, text_c=0xffffff, font=FONT_MONT_18, parent=None
-
-    # Show interface components
+    hide_main_screen()
 
     settings_logo_image.set_hidden(False)
     choose_language_text.set_hidden(False)
     save_button.set_hidden(False)
+    from_text.set_hidden(False)
+    to_text.set_hidden(False)
+
+    input_language_dropdown.set_hidden(False)
+    input_language_dropdown.set_options(options)
+    input_language_dropdown.set_sel_index(4)
+
+    output_language_dropdown.set_hidden(False)
+    output_language_dropdown.set_options(options)
+    output_language_dropdown.set_sel_index(6)
 
 def hide_settings_screen():
 
@@ -192,24 +255,48 @@ def hide_settings_screen():
     settings_logo_image.set_hidden(True)
     choose_language_text.set_hidden(True)
     save_button.set_hidden(True)
+    input_language_dropdown.set_hidden(True)
+    output_language_dropdown.set_hidden(True)
+    from_text.set_hidden(True)
+    to_text.set_hidden(True)
 
 ################################################ METHODS ################################################
 
 ######### Button methods ######### 
+
+# Save button pressed method
+
+def save_button_pressed():
+    global language_input_name, language_output_name
+
+    selected_input_index = input_language_dropdown.get_sel_index()
+    selected_input_language_name = options[selected_input_index]
+
+    selected_output_index = output_language_dropdown.get_sel_index() 
+    selected_output_language_name = options[selected_output_index]
+
+    language_input_name = selected_input_language_name
+    language_output_name = selected_output_language_name
+    
+    wait(1)
+    hide_settings_screen()
+    show_main_screen()
+
+save_button.pressed(save_button_pressed)
 
 # Start button pressed method
 
 def start_button_pressed():
     hide_menu_screen()
     wait(1)
-    show_main_screen()
+    show_settings_screen()
 
 start_button.pressed(start_button_pressed) 
 
 # Choose language button pressed method
 
 def language_button_pressed():
-
+    hide_menu_screen()
     show_settings_screen()
 
 language_button.pressed(language_button_pressed)
@@ -294,12 +381,10 @@ def translate(timer):
 
         # Decode audio file translated
         rgb.setColorAll(0x0064b0)
-#        decode_wav()
 
         # Play the audio file
         repeat_button_pressed()    
         rgb.setColorAll(0x33ff33)
-
 
     except Exception as e:
         print(e)
@@ -316,13 +401,6 @@ def encode_wav():
 
     # Encode the content as base64
     encoded_audio_file = base64.b64encode(content).decode('utf-8')
-
-#def decode_wav():
-#    global translated_audio_content
-#    audio_content = base64.b64decode(translated_audio_content)
-#    with open('/flash/translated_audio.wav', 'wb') as f:
-#        f.write(audio_content)
-
 
 def GCF_trigger_iotTranslator_cloud_functions(language_input_name, language_output_name, encoded_audio_file):
     global encoded_audio_translated
@@ -350,9 +428,9 @@ def GCF_trigger_iotTranslator_cloud_functions(language_input_name, language_outp
     except requests.RequestException as e:
         encoded_audio_translated = "Error: " + str(e)
 
+######### Init Display #########
 
 def start_application():
-######### Init Display #########
     hide_record_screen()
     hide_main_screen()
     hide_settings_screen()
