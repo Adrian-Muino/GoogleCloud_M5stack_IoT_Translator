@@ -326,7 +326,7 @@ def translate(timer):
 def transcribe_wav():
 
     # Set the API key and language code
-    api_key = 'AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0'
+    api_key = 'OUR_API_KEY'
     language_code = 'en-US'
 
     # Set the URL of the Speech-to-Text API endpoint  
@@ -372,7 +372,7 @@ def transcribe_wav():
 # Translate method using Cloud API
 
 def translate_text():
-  api_key = 'AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0'
+  api_key = 'OUR_API_KEY'
 
   url = 'https://translation.googleapis.com/language/translate/v2?key=' + api_key
 
@@ -409,7 +409,7 @@ def translate_text():
 # Say translated text method using cloud API
 
 def say_translated_text():
-    api_key = 'AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0'
+    api_key = 'OUR_API_KEY'
     
     # Set the URL of the Cloud Text-to-Speech API endpoint
 
