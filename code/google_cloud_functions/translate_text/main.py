@@ -8,7 +8,7 @@ def translate_text(request):
         input_language_code = request_json['input_language_code']
         output_language_code = request_json['output_language_code']
 
-        api_key = "AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0"
+        api_key = "OUR_API_KEY"
         url = "https://translation.googleapis.com/language/translate/v2?key="
 
         request_url = f"{url}{api_key}"

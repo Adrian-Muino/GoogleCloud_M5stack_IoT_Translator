@@ -7,7 +7,7 @@ def transcribe_wav(request):
     input_language_code = request_json['input_language_code']
     encoded_audio_file = request_json['encoded_audio_file']
 
-    api_key = 'AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0'
+    api_key = 'OUR_API_KEY'
     url = 'https://speech.googleapis.com/v1/speech:recognize?key=' + api_key
 
     headers = {

@@ -6,7 +6,7 @@ def generate_audio_from_text(request):
     translated_text = request_json['translated_text']
     output_language_code = request_json['output_language_code']
 
-    api_key = "AIzaSyBQXF-YzRFaUFfpOAA7bznV0z4ncw1jpn0"
+    api_key = "OUR_API_KEY"
     url = 'https://texttospeech.googleapis.com/v1/text:synthesize?key=' + api_key
     data = {
         'input': {'text': translated_text},

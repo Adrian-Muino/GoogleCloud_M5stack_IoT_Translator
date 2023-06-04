@@ -2,13 +2,12 @@ import requests
 import traceback
 
 def get_BCP47_language_tag(language_name):
-    url = 'https://europe-central2-iottranslator.cloudfunctions.net/'
-    method_name = 'get_BCP47_language_tag'
-    endpoint = url + method_name
+    url = 'OUR_GOOGLE_CLOUD_FUNCTION_URL/get_BCP47_language_tag'
+
     params = {'language_input': language_name}
 
     try:
-        response = requests.get(endpoint, params=params)
+        response = requests.get(url, params=params)
         response.raise_for_status()  # Raises an exception if the request was unsuccessful
         return response.text
     except requests.exceptions.RequestException as e:
@@ -16,7 +15,7 @@ def get_BCP47_language_tag(language_name):
 
 
 def transcribe_wav(input_language_code, encoded_audio_file):
-    url = 'https://europe-central2-iottranslator.cloudfunctions.net/transcribe_wav'
+    url = 'OUR_GOOGLE_CLOUD_FUNCTION_URL/transcribe_wav'
 
     # Create the request payload
     payload = {
@@ -37,7 +36,7 @@ def transcribe_wav(input_language_code, encoded_audio_file):
 
 def translate_text(transcribed_text,input_language_code,language_output_code):
 
-    url = "https://europe-central2-iottranslator.cloudfunctions.net/translate_text"
+    url = "OUR_GOOGLE_CLOUD_FUNCTION_URL/translate_text"
 
     payload = {
         "transcribed_text": transcribed_text,
@@ -59,7 +58,7 @@ def translate_text(transcribed_text,input_language_code,language_output_code):
 
 def generate_audio_from_text(translated_text, output_language_code):
 
-    url = 'https://europe-central2-iottranslator.cloudfunctions.net/generate_audio_from_text'
+    url = 'OUR_GOOGLE_CLOUD_FUNCTION_URL/generate_audio_from_text'
     data = {
         'translated_text': translated_text,
         'output_language_code': output_language_code
