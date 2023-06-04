@@ -294,7 +294,7 @@ def translate(timer):
 
         # Decode audio file translated
         rgb.setColorAll(0x0064b0)
-        decode_wav()
+#        decode_wav()
 
         # Play the audio file
         repeat_button_pressed()    
@@ -317,15 +317,16 @@ def encode_wav():
     # Encode the content as base64
     encoded_audio_file = base64.b64encode(content).decode('utf-8')
 
-def decode_wav():
-    global encoded_audio_file
-    translated_audio_content = base64.b64decode(encoded_audio_translated)
-    with open('/flash/translated_audio.wav', 'wb') as f:
-        f.write(translated_audio_content)
+#def decode_wav():
+#    global translated_audio_content
+#    audio_content = base64.b64decode(translated_audio_content)
+#    with open('/flash/translated_audio.wav', 'wb') as f:
+#        f.write(audio_content)
 
 
 def GCF_trigger_iotTranslator_cloud_functions(language_input_name, language_output_name, encoded_audio_file):
     global encoded_audio_translated
+    
     url = "https://europe-central2-iottranslator.cloudfunctions.net/trigger_iotTranslator_cloud_functions"
 
     data = {
@@ -334,16 +335,20 @@ def GCF_trigger_iotTranslator_cloud_functions(language_input_name, language_outp
         'encoded_audio_file': encoded_audio_file
     }
 
+    headers = {'Content-Type': 'application/json'}
+
     try:
-        response = requests.post(url, json=data)
+        response = requests.post(url, headers=headers, json=data)
+        
         if response.status_code == 200:
-            # Process the response as needed
-            encoded_audio_translated = response.content
+            translated_audio_content = response.content
+            with open('/flash/translated_audio.wav', 'wb') as f:
+                    f.write(translated_audio_content)
         else:
-            encoded_audio_translated = "Error: " + response.status_code + response.text
+            encoded_audio_translated = "Error: " + str(response.status_code) + str(response.text)
 
     except requests.RequestException as e:
-        encoded_audio_translated = "Error:" + str(e)
+        encoded_audio_translated = "Error: " + str(e)
 
 
 def start_application():
