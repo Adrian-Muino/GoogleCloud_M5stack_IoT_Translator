@@ -1,4 +1,9 @@
 # GoogleCloud M5stack IoT Translator
+----
+
+*By Adrian Muino, Yonah Bôle and Guillaume Emery*
+
+
 ## 🚀About this Project
 
 This is a speech-to-speech translator application designed for an IoT device called M5Stack. The application allows users to record their voice and translate it into another language using cloud-based translation services. The translated audio is played back to the user through the device's speaker.
@@ -57,9 +62,3 @@ Steps to run the application on the M5Stack IoT device:
 2. `transcribe_wav` transcribes the speech in a WAV audio file then sends an HTTP POST request to the GCF endpoint with the `input_language_code` and `encoded_audio_file` parameters
 3. `translate_text`  translates the transcribed text then sends an HTTP POST request to the GCF endpoint with the `transcribed_text`, `input_language_code`, and `output_language_code` parameters
 4. `generate_audio_from_text` generates audio from the translated text. It sends an HTTP POST request to the GCF endpoint with the `translated_text` and `language_output_code` parameters
-
-## 🧍🏼Collaborators
-
-- Adrian Muino
-- Yonah Bôle
-- Guillaume Emery
