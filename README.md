@@ -7,7 +7,7 @@
 ## 🚀About this Project
 
 This is a speech-to-speech translator application designed for an IoT device called M5Stack. The application allows users to record their voice and translate it into another language using cloud-based translation services. The translated audio is played back to the user through the device's speaker.
-[Video YouTube of the project](https://youtu.be/Cs8R1Efr-yY)
+[Video YouTube of the project](https://youtu.be/yl7p58TsdJU)
 
 ## ✅ Features
 
